@@ -1,0 +1,26 @@
+{
+  "name": "scrum_poker_socket",
+  "version": "1.0.0",
+  "description": "Backend socket to scrum poker.",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node dist/index.js",
+    "client": "tsc && node dist/client.js"
+  },
+  "keywords": [
+    "socket",
+    "scrum",
+    "poker"
+  ],
+  "author": "Marcus Paulo M Dias <marcusmazzon@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "socket.io": "^4.5.1",
+    "socket.io-client": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/socket.io": "^3.0.2",
+    "typescript": "^4.7.4"
+  }
+}
