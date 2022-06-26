@@ -1,12 +1,12 @@
 import { io } from "socket.io-client";
 
-const socket = io("ws://127.0.0.1:3001", {
+const socket = io("http://127.0.0.1:3001", {
     reconnection: true
 });
 
 socket.on("connect", () => {
     console.log("connected")
-    socket.emit('rooms', {room: 'test'})
+    socket.emit('joinRoom', {room: 'test'})
     console.log("emit")
 })
 
