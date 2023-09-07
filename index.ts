@@ -21,14 +21,18 @@ interface ServerToClientEvents {
   isSpectator: (data: User) => void;
   newRoom: (id: string) => void;
   sd: (data: Average) => void;
+  listAllRooms: (data: any) => void;
+  changeDeckOfCards: (data: string) => void;
 }
 interface ClientToServerEvents {
   joinRoom: (data: any) => void;
-  vote: (vote: string) => void;
+  vote: (vote: string | null) => void;
   clear: () => void;
   showVotes: () => void;
   isSpectator: () => void;
   newRoom: () => void;
+  listAllRooms: () => void;
+  changeDeckOfCards: (data: string) => void;
 }
 
 import { createServer } from "http";
@@ -57,6 +61,18 @@ io.on('connection', (socket) => {
       roomId = roomId+'1'
     }
     socket.emit('newRoom', roomId);
+  })
+
+  socket.on('listAllRooms', () => {
+    console.log(rooms);
+    socket.emit('listAllRooms', Array.from(rooms.keys()));
+  })
+
+  socket.on('changeDeckOfCards', (data) => {
+    const room = userRoom.get(socket.id)!
+    const userIndex = rooms.get(room)!.findIndex(r => r.id === socket.id)
+    const user = rooms.get(room)![userIndex]
+    socket.to(room).emit('changeDeckOfCards', data);
   })
 
   socket.on('joinRoom', (data) => {
@@ -100,9 +116,13 @@ io.on('connection', (socket) => {
   socket.on('vote', (data) => {
     const room = userRoom.get(socket.id)!
     const user = rooms.get(room)!.findIndex((u: User) => u.id === socket.id)
+    let isVoted = true
     if (user != -1) {
+      if (!data) {
+        isVoted = false
+      }
       rooms.get(room)![user].vote = data
-      rooms.get(room)![user].isVoted = true
+      rooms.get(room)![user].isVoted = isVoted
     }
     socket.to(room).emit('voted', socket.id);
     socket.emit('voted', socket.id);
@@ -178,7 +198,7 @@ io.on('connection', (socket) => {
       return
     }
     const arr = rooms.get(room) || []
-    const validVotes = arr.filter(user => user.isSpectator === false  && parseFloat(user.vote!) != NaN)
+    const validVotes = arr.filter(user => user.isSpectator === false)
 
     const sum = validVotes.reduce((acc, user) => {
         const v = parseFloat(user.vote!) || 0
