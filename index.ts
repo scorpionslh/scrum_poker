@@ -70,8 +70,7 @@ io.on('connection', (socket) => {
 
   socket.on('changeDeckOfCards', (data) => {
     const room = userRoom.get(socket.id)!
-    const userIndex = rooms.get(room)!.findIndex(r => r.id === socket.id)
-    const user = rooms.get(room)![userIndex]
+    console.log('changeDeckOfCards')
     socket.to(room).emit('changeDeckOfCards', data);
   })
 
@@ -198,7 +197,7 @@ io.on('connection', (socket) => {
       return
     }
     const arr = rooms.get(room) || []
-    const validVotes = arr.filter(user => user.isSpectator === false)
+    const validVotes = arr.filter(user => user.isSpectator === false && parseFloat(user.vote!) > 0)
 
     const sum = validVotes.reduce((acc, user) => {
         const v = parseFloat(user.vote!) || 0
